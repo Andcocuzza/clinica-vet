@@ -9,5 +9,9 @@ router.get('/:id', animalController.getAnimalById); // Buscar animal pelo ID
 router.post('/', animalController.createAnimal); // Criar um novo animal
 router.put('/:id', animalController.updateAnimal); // Atualizar animal pelo ID
 router.delete('/:id', animalController.deleteAnimal); // Deletar animal pelo ID
+router.get('/teste', (req, res) => {
+  res.send("Rota de atendimentos funcionando!");
+});
+
 
 module.exports = router;

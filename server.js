@@ -10,16 +10,23 @@ app.use(cors());
 app.use(express.json());
 
 // Rotas
-const tutorRoutes = require('./routes/tutor');
-const animalRoutes = require('./routes/animal');
-const servicoRoutes = require('./routes/servico');
-const historicoRoutes = require('./routes/historico');
+const tutorRoutes = require('./routes/tutorRoutes');
+const animalRoutes = require('./routes/animalRoutes');
+const servicoRoutes = require('./routes/servicoRoutes');
+const historicoRoutes = require('./routes/historicoRoutes');
+const atendimentosRoutes = require('./routes/atendimentosRoutes');
+
+console.log("AtendimentosRoutes carregadas:", atendimentosRoutes);
+
 
 app.use('/tutores', tutorRoutes);
 app.use('/animais', animalRoutes);
 app.use('/servicos', servicoRoutes);
 app.use('/historicos', historicoRoutes);
+app.use('/atendimentos', atendimentosRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
+
+
