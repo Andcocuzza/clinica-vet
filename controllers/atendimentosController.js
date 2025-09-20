@@ -1,13 +1,12 @@
-// controllers/atendimentoController.js
+// controllers/atendimentosController.js
 const { createHistoricoAutomatico } = require('./historicoController');
-
-const db = require('../db'); 
+const db = require('../db');
 
 // Listar todos os atendimentos
 exports.getAllAtendimentos = (req, res) => {
   const sql = "SELECT * FROM atendimentos";
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+    if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 };
@@ -17,7 +16,7 @@ exports.getAtendimentosById = (req, res) => {
   const { id } = req.params;
   const sql = "SELECT * FROM atendimentos WHERE id = ?";
   db.query(sql, [id], (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+    if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Atendimento não encontrado" });
     res.json(results[0]);
   });
@@ -25,19 +24,21 @@ exports.getAtendimentosById = (req, res) => {
 
 // Criar novo atendimento
 exports.createAtendimentos = (req, res) => {
-  const { animal_id, servico, data, tipo } = req.body; // tipo: 'Consulta', 'Vacina', 'Exame'
-  const sql = "INSERT INTO atendimentos (animal_id, servico, data, tipo) VALUES (?, ?, ?, ?)";
-  db.query(sql, [animal_id, servico, data, tipo], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
+  const { animal_id, data_atendimento, tipo, descricao } = req.body; // Campos do banco
+  const sql = "INSERT INTO atendimentos (animal_id, data_atendimento, tipo, descricao) VALUES (?, ?, ?, ?)";
+
+  db.query(sql, [animal_id, data_atendimento, tipo, descricao], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
 
     // Registrar automaticamente no histórico
-    createHistoricoAutomatico(animal_id, servico, data, tipo);
-    res.status(201).json({ 
-      id: result.insertId, 
-      animal_id, 
-      servico, 
-      data, 
-      tipo 
+    createHistoricoAutomatico(animal_id, data_atendimento, tipo, descricao);
+
+    res.status(201).json({
+      id: result.insertId,
+      animal_id,
+      data_atendimento,
+      tipo,
+      descricao
     });
   });
 };
@@ -45,11 +46,11 @@ exports.createAtendimentos = (req, res) => {
 // Atualizar atendimento
 exports.updateAtendimentos = (req, res) => {
   const { id } = req.params;
-  const { animal_id, servico, data, tipo } = req.body;
+  const { animal_id, data_atendimento, tipo, descricao } = req.body;
+  const sql = "UPDATE atendimentos SET animal_id=?, data_atendimento=?, tipo=?, descricao=? WHERE id=?";
 
-  const sql = "UPDATE atendimentos SET animal_id=?, servico=?, data=?, tipo=? WHERE id=?";
-  db.query(sql, [animal_id, servico, data, tipo, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
+  db.query(sql, [animal_id, data_atendimento, tipo, descricao, id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Atendimento atualizado com sucesso" });
   });
 };
@@ -58,8 +59,9 @@ exports.updateAtendimentos = (req, res) => {
 exports.deleteAtendimentos = (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM atendimentos WHERE id = ?";
+
   db.query(sql, [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
+    if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Atendimento removido com sucesso" });
   });
 };
